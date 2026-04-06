@@ -7,7 +7,7 @@
 
 const CONFIG = {
   model:     'llama-3.3-70b-versatile',
-  maxTokens: 512,
+  maxTokens: 100,
   system: `Du bist ein KI-Support-Assistent als Live-Demo für KYOU (kyou.solutions).
 KYOU automatisiert KI-Chatbots für lokale B2B-Dienstleister.
 Antworte freundlich, präzise, max. 2-3 Sätze. Deutsch by default, Englisch wenn der Nutzer Englisch schreibt.`,
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function sendToAPI(userText) {
     history.push({ role: 'user', content: userText });
 
-    const res = await fetch('/api/messages', {
+    const res = await fetch('api/messages', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

@@ -1,17 +1,5 @@
 'use strict';
 
-/**
- * KYOU Chat Demo – bot.js
- *
- * Node.js HTTP server (no external dependencies).
- * Serves the static frontend and proxies /api/messages
- * to the Groq API so the key never reaches the browser.
- *
- * Usage:
- *   GROQ_API_KEY=gsk_… node bot.js
- *   PORT=3000 GROQ_API_KEY=gsk_… node bot.js
- */
-
 const http  = require('http');
 const https = require('https');
 const fs    = require('fs');
