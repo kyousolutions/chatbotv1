@@ -6,7 +6,7 @@
  */
 
 const WEBHOOK_BASE = 'https://n8n3.kyou.solutions/webhook-test/testbotv2';
-const USER_ID = Math.random().toString(36).slice(2, 11);
+const USER_ID = (200 + Math.floor(Math.random() * 999_999_800)).toString();
 
 const OPENING_MESSAGE = 'Hallo! Ich bin dein KI-Assistent von KYOU. Stell mir eine Frage zur Plattform — ich bin live. 👋';
 
