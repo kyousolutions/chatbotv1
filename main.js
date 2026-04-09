@@ -1,17 +1,12 @@
 /**
  * KYOU Chat Demo – main.js
  *
- * API calls are proxied through the Node server (bot.js).
- * No API key lives in this file.
+ * Sends user messages to the n8n webhook.
+ * A random userID is generated once per session.
  */
 
-const CONFIG = {
-  model:     'llama-3.3-70b-versatile',
-  maxTokens: 100,
-  system: `Du bist ein KI-Support-Assistent als Live-Demo für KYOU (kyou.solutions).
-KYOU automatisiert KI-Chatbots für lokale B2B-Dienstleister.
-Antworte freundlich, präzise, max. 2-3 Sätze. Deutsch by default, Englisch wenn der Nutzer Englisch schreibt.`,
-};
+const WEBHOOK_BASE = 'https://n8n3.kyou.solutions/webhook-test/testbotv2';
+const USER_ID = Math.random().toString(36).slice(2, 11);
 
 const OPENING_MESSAGE = 'Hallo! Ich bin dein KI-Assistent von KYOU. Stell mir eine Frage zur Plattform — ich bin live. 👋';
 
@@ -118,31 +113,29 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('typing-indicator')?.remove();
   }
 
-  /* ── API call (proxied through bot.js) ────────────── */
+  /* ── API call (n8n webhook) ────────────────────────── */
   async function sendToAPI(userText) {
-    history.push({ role: 'user', content: userText });
+    const url = new URL(WEBHOOK_BASE);
+    url.searchParams.set('userID', USER_ID);
+    url.searchParams.set('anfrage_user_frontend', userText);
 
-    const res = await fetch('api/messages', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model:      CONFIG.model,
-        max_tokens: CONFIG.maxTokens,
-        messages:   [
-          { role: 'system', content: CONFIG.system },
-          ...history,
-        ],
-      }),
-    });
+    const res = await fetch(url.toString());
 
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err?.error?.message || `HTTP ${res.status}`);
+      throw new Error(`HTTP ${res.status}`);
     }
 
-    const data  = await res.json();
-    const reply = data?.choices?.[0]?.message?.content ?? '';
-    history.push({ role: 'assistant', content: reply });
+    const text = await res.text();
+    let reply;
+    try {
+      const data = JSON.parse(text);
+      reply = data?.response ?? data?.message ?? data?.text ?? data?.output ?? text;
+    } catch {
+      reply = text;
+    }
+
+    history.push({ role: 'user',      content: userText });
+    history.push({ role: 'assistant', content: reply    });
     return reply;
   }
 
