@@ -1,4 +1,4 @@
-const WEBHOOK_BASE = 'https://n8n3.kyou.solutions/webhook-test/testbotv2';
+const WEBHOOK_BASE = 'https://n8n3.kyou.solutions/webhook/testbotv2';
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', 'https://www.kyou.solutions');
