@@ -1,3 +1,5 @@
+const WEBHOOK_BASE = 'https://n8n3.kyou.solutions/webhook-test/testbotv2';
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', 'https://www.kyou.solutions');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -11,18 +13,17 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: { message: 'Method not allowed' } });
   }
 
-  try {
-    const upstream = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-      },
-      body: JSON.stringify(req.body),
-    });
+  const { userID, anfrage_user_frontend } = req.body;
 
-    const data = await upstream.json();
-    res.status(upstream.status).json(data);
+  try {
+    const url = new URL(WEBHOOK_BASE);
+    url.searchParams.set('userID', userID);
+    url.searchParams.set('anfrage_user_frontend', anfrage_user_frontend);
+
+    const upstream = await fetch(url.toString());
+    const text     = await upstream.text();
+
+    res.status(upstream.status).send(text);
   } catch {
     res.status(502).json({ error: { message: 'Bad gateway' } });
   }

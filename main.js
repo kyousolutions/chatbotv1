@@ -113,13 +113,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('typing-indicator')?.remove();
   }
 
-  /* ── API call (n8n webhook) ────────────────────────── */
+  /* ── API call (proxied through api/messages) ──────── */
   async function sendToAPI(userText) {
-    const url = new URL(WEBHOOK_BASE);
-    url.searchParams.set('userID', USER_ID);
-    url.searchParams.set('anfrage_user_frontend', userText);
-
-    const res = await fetch(url.toString());
+    const res = await fetch('api/messages', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ userID: USER_ID, anfrage_user_frontend: userText }),
+    });
 
     if (!res.ok) {
       throw new Error(`HTTP ${res.status}`);
