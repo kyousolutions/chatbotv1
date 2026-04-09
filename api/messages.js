@@ -3,6 +3,9 @@ const TIMEOUT_MS    = 15_000;
 const MAX_MSG_CHARS = 1_000;
 const MAX_BODY_KB   = 8;
 
+// Only letters (all languages), numbers, whitespace, and common punctuation
+const ALLOWED = /^[\p{L}\p{N}\s.,!?;:'"()\-–—@/+&%°€#…]+$/u;
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin',  'https://www.kyou.solutions');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -27,6 +30,9 @@ module.exports = async function handler(req, res) {
   }
   if (msg.length > MAX_MSG_CHARS) {
     return res.status(400).json({ error: { message: `Message too long (max ${MAX_MSG_CHARS} chars)` } });
+  }
+  if (!ALLOWED.test(msg.trim())) {
+    return res.status(400).json({ error: { message: 'Nachricht enthält ungültige Zeichen' } });
   }
 
   // Webhook call with timeout

@@ -192,6 +192,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ── Event listeners ──────────────────────────────── */
   chatInput.addEventListener('input', () => {
+    const cleaned = chatInput.value.replace(/[^\p{L}\p{N}\s.,!?;:'"()\-–—@/+&%°€#…]/gu, '');
+    if (cleaned !== chatInput.value) {
+      const pos = chatInput.selectionStart - (chatInput.value.length - cleaned.length);
+      chatInput.value = cleaned;
+      chatInput.setSelectionRange(pos, pos);
+    }
     autoResizeTextarea();
     updateSendBtn();
   });
